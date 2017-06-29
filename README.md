@@ -1,3 +1,5 @@
+* Notice that this a static copy of a repository containing code from several projects an developed by multiple people in the Matsen group (matsen.fhcrc.org). This copy is meant for reproducing results and figures in my (Kristian Davidsen) master's thesis.
+
 # gctree
 
 The project is to come up with (relatively simple) models of B cell diversification within germinal centers that can be used as part of inference. When we say relatively simple, we mean analogous to the coalescent rather than something like
