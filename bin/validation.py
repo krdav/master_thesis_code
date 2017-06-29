@@ -7,6 +7,7 @@ comparison of inference and simulated trees
 
 from __future__ import division, print_function
 from gctree import CollapsedTree, CollapsedForest, hamming_distance
+from random import randint
 try:
     import cPickle as pickle
 except:
@@ -18,7 +19,7 @@ matplotlib.use('PDF')
 from matplotlib import pyplot as plt
 import seaborn as sns
 sns.set(style='white', color_codes=True)
-import os
+import os, sys
 import numpy as np
 try:
     import jellyfish  # Last time I checked this module was the fastest kid on the block, however 2x slower than a simple Cython function
@@ -42,19 +43,22 @@ def reconstruct_lineage(tree, node):
 
 
 def find_node_by_seq(tree, sequence):
-    node = [node for node in tree.traverse() if node.sequence == sequence and node.frequency > 0]
+    nodes = [node for node in tree.traverse() if node.sequence == sequence and node.frequency > 0]
+    if len(nodes) > 1:
+        nodes = [nodes[randint(0, len(nodes)-1)]]
     try:
-        assert(len(node) == 1)
+        assert(len(nodes) == 1)
     except Exception as e:
         print('Nodes list:')
-        print(node)
-
+        print(nodes)
+        print(sequence)
         print(tree)
-        print(node[0])
-        print(node[1])
+        print([(node.frequency, node.name, node.sequence) for node in tree.traverse()])
+        print(nodes[0])
+        print(nodes[1])
 
         raise e
-    return node[0]
+    return nodes[0]
 
 
 def align_lineages(seq, tree_t, tree_i, gap_penalty_pct=0, known_root=True, allow_double_gap=False):
@@ -185,7 +189,8 @@ def align_lineages(seq, tree_t, tree_i, gap_penalty_pct=0, known_root=True, allo
 def lineage_dist(true_tree, inferred_tree, freq_weigthing=False, known_root=True, allow_double_gap=False):
     norm_lineage_dist = list()
     nlineages = 0
-    for node in true_tree.tree.traverse():
+#    for node in true_tree.tree.traverse():
+    for node in true_tree.tree.iter_leaves():  # Iterate only through the leaves
         if not node.frequency > 0:
             continue
 
